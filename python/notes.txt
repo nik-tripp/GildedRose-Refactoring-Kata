@@ -1,0 +1,36 @@
+2022/03/15
+----------------------------------
+First off, if I miss something while I'm working on this, I want to just have the old version to look at, so I'll
+just comment all of that out for posterity
+
+If I were going to do an absolutely minimally intrusive update (perhaps if there were something truly arcane going on
+in this function that made reworking it a dangerous proposal), I would probably just go find the gate that changes
+normal item quality and add a ternary that checks whether the item is "conjured" and double the degradation if so.
+
+Thankfully, that's not the case, because this code hurt to read.
+
+I'm going to make constants for the strings I need to reference because I really don't feel like debugging for 5 hours
+only to find a typo that I simply wasn't registering in the outputs.
+
+As far as making sure my edits work (and that the current code worked, for that matter) I'm going to do a case for each
+type of object that makes sure each item behaves as expected according to the rules, then make a test that ensures
+nothing but Sulfuras can have OOB quality levels.
+
+As I'm writing these tests, I'm realizing that I'm not certain whether "sell_in" is 0-based, but I'm assuming/inferring
+that something is only expired when that value is negative, and 0 is actually the last day to sell it. Additionally, I'm
+going to hope that one cannot have a Conjured Backstage Pass or Aged Brie. Normally I would get clarification from
+whoever is making the requirements.
+
+It looks like conjured items are only denoted by starting with the word conjured, so I could just check whether a name
+includes that word, but I'm going to make a quick function that splits and checks the first word only, since there's
+no guarantee that normal items won't have the word conjured somewhere in their name.
+
+Since this looks like new kinds of items need to have room (Gilded Rose is stepping up production, here), I'm actually
+going to make small separate functions for any update logics that are more than one line, just to keep the major
+"filtering based on kind" logic more readable. For readability as more kinds get added, I'm also going to try to adhere
+to single returns (here it's single updates) on the item qualities and sell-by dates
+
+After finishing the updates and running the tester, I'm glad I was checking all the special cases, because my first run
+at the function to get the change in backstage passes wasn't treating 0 properly. Additionally, my first pass at
+"is_conjured" wasn't looking for the correct values because I forgot that I had added a space to the constant while
+writing my testers.
